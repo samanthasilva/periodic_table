@@ -3,3 +3,4 @@ Adicionando uma nova linha ao arquivo.
 2Adicionando uma nova linha ao arquivo.
 3Adicionando uma nova linha ao arquivo.
 4Adicionando uma nova linha ao arquivo.
+5Adicionando uma nova linha ao arquivo.
