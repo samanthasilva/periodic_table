@@ -1,2 +1,3 @@
 Este é um arquivo de exemplo.
 Adicionando uma nova linha ao arquivo.
+2Adicionando uma nova linha ao arquivo.
