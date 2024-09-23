@@ -8,30 +8,18 @@ then
 else
   if [[ $1 =~ ^[0-9]+$ ]]
   then
-    # Argument is a number
-    QUERY="SELECT e.atomic_number, e.symbol, e.name, t.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius 
-           FROM elements e 
-           JOIN properties p ON e.atomic_number=p.atomic_number 
-           JOIN types t ON p.type_id=t.type_id 
-           WHERE e.atomic_number = $1"
+    QUERY_RESULT=$($PSQL "SELECT atomic_number, name, symbol, atomic_mass, melting_point_celsius, boiling_point_celsius, type FROM elements INNER JOIN properties USING(atomic_number) INNER JOIN types USING(type_id) WHERE atomic_number=$1")
   else
-    # Argument is a string (symbol or name)
-    QUERY="SELECT e.atomic_number, e.symbol, e.name, t.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius 
-           FROM elements e 
-           JOIN properties p ON e.atomic_number=p.atomic_number 
-           JOIN types t ON p.type_id=t.type_id 
-           WHERE e.symbol = '$1' OR e.name = '$1'"
+    QUERY_RESULT=$($PSQL "SELECT atomic_number, name, symbol, atomic_mass, melting_point_celsius, boiling_point_celsius, type FROM elements INNER JOIN properties USING(atomic_number) INNER JOIN types USING(type_id) WHERE symbol='$1' OR name='$1'")
   fi
 
-  ELEMENT=$($PSQL "$QUERY")
-
-  if [[ -z $ELEMENT ]]
+  if [[ -z $QUERY_RESULT ]]
   then
     echo "I could not find that element in the database."
   else
-    echo "$ELEMENT" | while IFS="|" read ATOMIC_NUMBER SYMBOL NAME TYPE ATOMIC_MASS MELTING_POINT_CELSIUS BOILING_POINT_CELSIUS
+    echo $QUERY_RESULT | while IFS="|" read ATOMIC_NUMBER NAME SYMBOL ATOMIC_MASS MELTING_POINT BOILING_POINT TYPE
     do
-      echo "The element with atomic number $ATOMIC_NUMBER is $NAME ($SYMBOL). It's a $TYPE, with a mass of $ATOMIC_MASS amu. $NAME has a melting point of $MELTING_POINT_CELSIUS celsius and a boiling point of $BOILING_POINT_CELSIUS celsius."
+      echo "The element with atomic number $ATOMIC_NUMBER is $NAME ($SYMBOL). It's a $TYPE, with a mass of $ATOMIC_MASS amu. $NAME has a melting point of $MELTING_POINT celsius and a boiling point of $BOILING_POINT celsius."
     done
   fi
 fi
